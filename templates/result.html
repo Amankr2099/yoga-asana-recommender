@@ -1,0 +1,144 @@
+{% extends "base.html" %} {% block title %}Recommendation{% endblock %}
+{% block content %}
+<div class="dynamic-background">
+  <div class="background-overlay"></div>
+</div>
+
+<!-- Loading Screen -->
+<div class="loading" id="loading-screen">
+  <h1>Building your Recommendation...</h1>
+  <img src="static/images/loading.gif" alt="gif" />
+</div>
+
+<!-- Actual Content (Hidden initially) -->
+<div id="actual-content" style="display: none">
+  <!-- Content Container -->
+  <div class="result-container">
+    <h1>Hi {{ name }}, here are your recommended asanas:</h1>
+    
+    <!-- Yoga Asanas -->
+    <div class="asanas-list">
+      {% for asana in asans %}
+      <div class="asana-card">
+        <h2>{{ asana.name }}</h2>
+        <div class="asana-image">
+          <img src="{{ asana.imageURL }}" alt="{{ asana.name }}" />
+        </div>
+        <h3>Step-by-Step Instructions:</h3>
+        <ol class="instructions">
+          {% for step in asana.procedure %}
+          <li>{{ step }}</li>
+          {% endfor %}
+        </ol>
+
+        <!-- Watch Tutorial Button -->
+        {% if asana.videoURL %}
+        <button class="btn">
+          <a
+            href="{{ asana.videoURL }}"
+            target="_blank"
+            class="watch-tutorial-btn"
+            >Watch Tutorial</a
+          >
+        </button>
+
+        {% endif %}
+
+        <div class="summary">
+          <h2>Benefits</h2>
+          
+          <p>{{asana.benefits}}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div>
+      <div>
+        <button id="get-schedule-button" class="back-link">Get Schedule</button>
+      </div>
+
+      <div id="schedule-result"></div>
+    </div>
+    <!-- Back to Home Link -->
+    <a href="{{ url_for('index') }}" class="back-link">Back to Home</a>
+  </div>
+</div>
+
+<script>
+  // Function to simulate the loading screen and then reveal actual content
+  function showResultAfterDelay() {
+    const loadingScreen = document.getElementById("loading-screen");
+    const actualContent = document.getElementById("actual-content");
+
+    // Show loading screen for 5 seconds
+    setTimeout(function () {
+      // Hide loading screen and show actual content
+      loadingScreen.style.display = "none";
+      actualContent.style.display = "block";
+    }, 2000); // 5000 ms = 5 seconds
+  }
+
+  // Run the function when the page is loaded
+  document.addEventListener("DOMContentLoaded", showResultAfterDelay);
+  
+
+  document
+    .getElementById("get-schedule-button")
+    .addEventListener("click", function () {
+      // Collect necessary data (replace these with your actual values or form data)
+      document.getElementById("get-schedule-button").style.display = "none";
+
+      document.getElementById("schedule-result").innerHTML = `
+   <div class="text-center">
+            <img
+              src="https://cdn.pixabay.com/animation/2022/07/31/05/09/05-09-47-978_512.gif"
+              alt="loading"
+            />
+          </div>
+    `;
+
+    const asansList = [];
+'{% for asan in asans %}'
+    asansList.push("{{ asan.name }}");
+'{% endfor %}'
+          console.log(asansList);
+          
+
+
+   
+      const userData = {
+        name: "{{ name }}",
+        age: "{{ age }}", // Access age value from Flask template
+        weight: "{{ weight }}", // Access weight value from Flask template
+        height: "{{ height }}", // Access height value from Flask template
+        goal: "{{ goals }}", // Access goal value from Flask template
+        asans: asansList, // Convert the list to JSON format to pass it correctly
+      };
+
+
+      // Make an AJAX request to Flask
+      fetch("/generate-schedule", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          // Hide the button and show the schedule
+          document.getElementById("schedule-result").innerHTML = `
+            <h3>Your Personalized Schedule:</h3>
+            <div id="schedule-content">
+            ${data.schedule}    
+            </div>
+
+        `;
+        })
+        .catch((error) => {
+          console.error("Error generating schedule:", error);
+        });
+    });
+</script>
+{% endblock %}
