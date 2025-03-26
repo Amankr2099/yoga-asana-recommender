@@ -67,7 +67,8 @@ Feel free to contribute to YogaFlow! Follow these steps:
 4. Push to your branch and create a Pull Request.
 
 ## License
-This project is licensed under the MIT License.
 
-## Contact
-For any questions or suggestions, reach out at **your-email@example.com**.
+This project is proprietary and all rights are reserved. You may not copy, modify, distribute, or use this code in any manner without explicit permission from the owner.
+
+Unauthorized use of this project is prohibited.
+
